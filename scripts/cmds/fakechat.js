@@ -1,79 +1,54 @@
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
-
-const mahmhd = async () => {
-  const base = await axios.get("https://raw.githubusercontent.com/mahmudx7/exe/main/baseApiUrl.json");
-  return base.data.mahmud;
-};
-
 module.exports = {
   config: {
     name: "fakechat",
-    aliases: ["fc", "F", "fake"],
-    version: "1.7",
-    author: "MahMUD",
-    role: 0,
-    category: "fun",
-    description: "Generate fake chat via reply, mention, or user uid",
-    countDown: 5,
+    aliases: ["fchat","fc"],
+    version: "1.0",
+    role: 1,
+    premium: true,
+    author: "Dipto",
+    Description: "Get a fake chat of user",
+    category: "system",
+    countDown: 10,
   },
+  onStart: async ({ event, message, usersData, api, args }) => {
+   try{
+     const userText = args.join(" ");
+    const uid1 = event.senderID;
 
-  onStart: async ({ event, message, args, usersData, api }) => {
-    const obfuscatedAuthor = String.fromCharCode(77, 97, 104, 77, 85, 68); // "MahMUD"
-    if (module.exports.config.author !== obfuscatedAuthor) {
-      return api.sendMessage(
-        "❌ | You are not authorized to change the author name.",
-        event.threadID,
-        event.messageID
-      );
-    }
+    const uid2 = Object.keys(event.mentions)[0];
+    let uid;
 
-    try {
-      let targetId;
-      let userText = args.join(" ").trim();
-
-      if (event.messageReply) {
-        targetId = event.messageReply.senderID || event.messageReply.sender?.id;
-      } else if (event.mentions && Object.keys(event.mentions).length > 0) {
-        targetId = Object.keys(event.mentions)[0];
-        const mentionName = event.mentions[targetId];
-        userText = args.join(" ").replace(new RegExp(`@?${mentionName}`, "gi"), "").trim();
-      } else if (args.length > 0 && /^\d+$/.test(args[0])) {
-        targetId = args[0];
-        userText = args.slice(1).join(" ").trim();
+    if (args[0]) {
+      if (/^\d+$/.test(args[0])) {
+        uid = args[0];
       } else {
-        return message.reply("❌ Please reply, mention, or provide user uid.");
+        const match = args[0].match(/profile\.php\?id=(\d+)/);
+        if (match) {
+          uid = match[1];
+        }
       }
-
-      if (!userText) return message.reply("❌ Please provide the text for the fake chat.");
-
-      let userName = "Unknown";
-      try {
-        userName = (await usersData.getName(targetId)) || targetId;
-      } catch {
-        userName = targetId;
-      }
-
-      const baseApi = await mahmhd();
-      const apiUrl = `${baseApi}/api/fakechat?id=${targetId}&name=${encodeURIComponent(
-        userName
-      )}&text=${encodeURIComponent(userText)}`;
-
-      const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
-      const filePath = path.join(__dirname, `fakechat_${Date.now()}.png`);
-      fs.writeFileSync(filePath, Buffer.from(response.data, "binary"));
-
-      await message.reply({
-        body: `🗨️ Fake chat generated for: ${userName}`,
-        attachment: fs.createReadStream(filePath),
-      });
-
-      setTimeout(() => {
-        try { fs.unlinkSync(filePath); } catch {}
-      }, 5000);
-    } catch {
-      await message.reply("🥹error, contact MahMUD.");
     }
-  },
+
+    if (!uid) {
+      uid =
+        event.type === "message_reply"
+          ? event.messageReply.senderID
+          : uid2 || uid1;
+    }
+
+    if(uid == 100044327656712) return message.reply("koto boro sahos tor😦");
+    
+    const avatarUrl = `https://graph.facebook.com/${uid}/picture?width=512&height=512&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
+    const userName = await usersData.getName(uid);
+     let oo = `https://www.noobs-api.rf.gd/dipto/fbfakechat?name=${userName}&dp=${encodeURIComponent(avatarUrl)}&text=${userText}`
+     const ci = event?.messageReply?.attachments[0]?.url;
+     if(ci) oo += `&chatimg=${encodeURIComponent(ci)}`
+    message.reply({
+      attachment: await global.utils.getStreamFromURL(oo),
+    });
+   } catch(e){
+     message.reply("error 😦😦")
+     console.log("fakechat error",e)
+   }
+  }
 };
