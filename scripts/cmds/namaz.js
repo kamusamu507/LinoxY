@@ -1,8 +1,8 @@
 const axios = require("axios");
 
 const baseApiUrl = async () => {
-  const base = await axios.get("https://raw.githubusercontent.com/mahmudx7/exe/main/baseApiUrl.json");
-  return base.data.mahmud;
+  const base = 'https://mahmud-namaz.onrender.com';
+  return base;
 };
 
 module.exports = {
@@ -14,30 +14,26 @@ module.exports = {
     countDown: 5,
     role: 0,
     category: "Islamic",
-    guide: "{pn} <city>\nExample: {pn} Dhaka"
+    guide: "{pn} <city>\n\n- {pn}: <city> Example: {pn} Dhaka"
   },
 
   onStart: async function ({ message, args }) {
     const city = args.join(" ") || "Dhaka";
-    const apiUrl = `${await baseApiUrl()}/api/namaz/font3/${encodeURIComponent(city)}`;
+    const apiUrl = `${await baseApiUrl()}/font3/${encodeURIComponent(city)}`;
 
     try {
-      const response = await axios.get(apiUrl, {
-        headers: { "author": module.exports.config.author }
-      });
-
-      if (response.data?.error) {
-        return message.reply(`${response.data.error}`);
+      const response = await axios.get(apiUrl);
+      
+      if (response.data && response.data.message) {
+        const msg = response.data.message;
+        message.reply(msg);
+      } else {
+        message.reply(`❌ No prayer times available for ${city}. Please try again later.`);
       }
-
-      if (response.data?.message) {
-        return message.reply(response.data.message);
-      }
-
-      return message.reply(`No prayer times available for ${city}.`);
+      
     } catch (error) {
       console.error(error);
-      return message.reply("Error fetching prayer times. Please try again later.");
+      message.reply(`❌ Error fetching prayer times for ${city}. Please make sure the city name is correct or try again later.`);
     }
   }
 };

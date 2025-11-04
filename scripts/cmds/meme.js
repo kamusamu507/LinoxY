@@ -1,47 +1,33 @@
 const axios = require("axios");
 
-const mahmud = async () => {
-  const base = await axios.get("https://raw.githubusercontent.com/mahmudx7/exe/main/baseApiUrl.json");
-  return base.data.mahmud;
-};
-
 module.exports = {
   config: {
     name: "meme",
-    aliases: ["memes"],
-    version: "1.7",
-    author: "MahMUD",
-    countDown: 10,
+    aliases: ["randommeme"],
+    version: "0.1",
     role: 0,
+    author: "Noob_DEVS",
+    description: "Get a random meme",
     category: "fun",
-    guide: "{pn}"
+    countDown: 5,
   },
 
   onStart: async function ({ message, event, api }) {
     try {
-      const apiUrl = await mahmud();
-      const res = await axios.get(`${apiUrl}/api/meme`);
-      const imageUrl = res.data?.imageUrl;
+      const response = await axios.get("https://www.noobz-api.rf.gd/api/meme");
 
-      if (!imageUrl) {
-        return message.reply("Could not fetch meme. Please try again later.");
-      }
+      const memeUrl = response.data.url;
+      const memeDescription =
+        response.data.description || "🐔 Here's a random meme!";
+      if (!memeUrl) return message.reply("❌ Failed to fetch meme.");
 
-      const stream = await axios({
-        method: "GET",
-        url: imageUrl,
-        responseType: "stream",
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-
-      await api.sendMessage({
-        body: "🐸 | 𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐫𝐚𝐧𝐝𝐨𝐦 𝐦𝐞𝐦𝐞",
-        attachment: stream.data
-      }, event.threadID, event.messageID);
-
-      return;
+      const attachment = await global.utils.getStreamFromURL(memeUrl);
+      await message.reply({ body: memeDescription, attachment });
     } catch (error) {
-      return message.reply("An error occurred while fetching meme.");
+      console.error("❌ Meme API Request Failed:", error);
+      message.reply(
+        "❌ Error: " + (error.response?.data?.message || error.message)
+      );
     }
-  }
+  },
 };

@@ -2,24 +2,36 @@ module.exports = {
   config: {
     name: "inbox",
     aliases: ["in"],
-    version: "1.7",
-    author: "MahMUD",
-    countDown: 5,
+    version: "1.0",
+    author: "Lafie Ayan",
+    countDown: 10,
     role: 0,
-    category: "system"
+    shortDescription: {
+      en: "hello goatbot inbox no prefix file enjoy the cmmand @ArYan"
+    },
+    longDescription: {
+      en: ""
+    },
+    category: "fun",
+    guide: {
+      en: ""
+    }
+  },
+  langs: {
+    en: {
+      gg: ""
+    },
+    id: {
+      gg: ""
+    }
   },
   onStart: async function({ api, event, args, message }) {
     try {
-      const obfuscatedAuthor = String.fromCharCode(77, 97, 104, 77, 85, 68); 
-      if (this.config.author !== obfuscatedAuthor) {
-      return api.sendMessage("You are not authorized to change the author name.\n", event.threadID, event.messageID);
-    }
-
       const query = encodeURIComponent(args.join(' '));
-      message.reply("𝐛𝐚𝐛𝐲 𝐜𝐡𝐞𝐜𝐤 𝐲𝐨𝐮𝐫 𝐢𝐧𝐛𝐨𝐱 🐤", event.threadID);
-      api.sendMessage("𝐡𝐢 𝐛𝐚𝐛𝐲😘", event.senderID);
+      message.reply("𝐁𝐨𝐤𝐚𝐜𝐡𝐨𝐝𝐚 𝐃𝐞𝐤𝐡 𝐒𝐦𝐬 𝐃𝐢𝐬𝐢 ✅\n\n  𝐄𝐡𝐨𝐧 𝐤𝐢 𝐈𝐧𝐛𝐨𝐱 𝐂𝐡𝐞𝐤 𝐃𝐞𝐰𝐚𝐫 𝐤𝐨𝐭𝐡𝐚𝐨 𝐁𝐨𝐥𝐚 𝐋𝐚𝐠𝐛𝐞? 🙄", event.threadID);
+      api.sendMessage("𝐊𝐢𝐫𝐞 𝐁𝐨𝐤𝐚𝐜𝐡𝐨𝐝𝐚\n😒", event.senderID);
     } catch (error) {
-      console.error("error baby: " + error);
+      console.error("Error bro: " + error);
     }
   }
-};
+}
